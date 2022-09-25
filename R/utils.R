@@ -14,7 +14,7 @@
 cdenva <- new.env()
 
 set_canvas_token <- function(token) {
- xpi <- assign("rcanvas_CANVAS_API_TOKEN", token, envir = cdenva)
+ assign("rcanvas_CANVAS_API_TOKEN", token, envir = cdenva)
 }
 
 # env for the Canvas domain
@@ -31,7 +31,7 @@ set_canvas_domain <- function(domain) {
 
 #' @rdname apihelpers
 check_token <- function() {
-  token <- get("xpi")
+  token <- get(assign("rcanvas_CANVAS_API_TOKEN", token, envir = cdenva))
   if (identical(token, "")) {
     stop("Please set your Canvas API token with set_canvas_token.",
          call. = FALSE)
