@@ -6,19 +6,19 @@
 #' @name apihelpers
 #' @md
 
+# env for the Canvas domain
+cdenv <- new.env()
+
 #' @param token your API token
 #' @export
 #' @rdname apihelpers
 #' @examples
 #' set_canvas_token("abc123")
 
-
 set_canvas_token <- function(token) {
- token <- token
+  assign("rcanvas_CANVAS_API_TOKEN", token, envir = cdenv)
 }
 
-# env for the Canvas domain
-cdenv <- new.env()
 #' @param domain Canvas domain
 #' @export
 #' @rdname apihelpers
@@ -30,7 +30,7 @@ set_canvas_domain <- function(domain) {
 
 #' @rdname apihelpers
 check_token <- function() {
-  token <- token
+  token <- get("rcanvas_CANVAS_API_TOKEN", envir = cdenv)
   if (identical(token, "")) {
     stop("Please set your Canvas API token with set_canvas_token.",
          call. = FALSE)
