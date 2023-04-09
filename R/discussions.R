@@ -71,7 +71,7 @@ update_discussion_id <- function(discussion_id, object_id, message,
 
 get_discussion_entries_by_user <- function(course_id, user_id) {
     # Construct the API endpoint for the course discussions
-    endpoint <- rcanvas::make_canvas_url("courses", course_id, "discussion_topics")
+    endpoint <- make_canvas_url("courses", course_id, "discussion_topics")
     
     # Get the discussion topics
     response <- canvas_query(endpoint)
