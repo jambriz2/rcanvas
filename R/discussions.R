@@ -66,3 +66,20 @@ update_discussion_id <- function(discussion_id, object_id, message,
                per_page = 100)
   canvas_query(url, args, "PUT")
 }
+
+
+
+get_discussion_entries_by_user <- function(course_id, user_id) {
+    # Construct the API endpoint for the course discussions
+    endpoint <- rcanvas::make_canvas_url("courses", course_id, "discussion_topics")
+    
+    # Get the discussion topics
+    response <- canvas_query(endpoint)
+    discussion_topics <- content(response, "parsed")
+    
+    # Function to get entries for a specific discussion topic
+    get_topic_entries <- function(topic_id) {
+        topic_endpoint <- make_canvas_url("courses", course_id, "discussion_topics", topic_id, "entries")
+        topic_response <- canvas_query(topic_endpoint)
+        content(topic_response, "parsed")
+    }
