@@ -41,8 +41,7 @@ get_submission_single <- function(course_id, type, type_id, user_id) {
     stop("type must be 'quizzes' or 'assignments'")
   url <- make_canvas_url('courses', course_id, type, type_id,
                          'submissions', user_id)
-  args <- list(access_token = check_token(),
-               per_page = 100)
+  args <- list(per_page = 100)
   resp <- canvas_query(url, args, "GET")
   df <- paginate(resp) %>%
     purrr::map(httr::content, "text") %>%
