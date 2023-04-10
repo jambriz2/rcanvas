@@ -118,8 +118,10 @@ do_query <- function(endpoint, args=NULL, method="GET", process_response=(method
 #'
 #' This function tests the Canvas API access by retrieving the course information
 #' for the specified course ID.
+#'
 #' @param course_id The course ID for which to retrieve the information.
 #' @return A parsed JSON object containing the course information.
+#' @export
 #' @examples
 #' course_info <- test_canvas_api(12345)
 #' print(course_info)
