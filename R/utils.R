@@ -128,5 +128,5 @@ do_query <- function(endpoint, args=NULL, method="GET", process_response=(method
 test_canvas_api <- function(course_id) {
   endpoint <- make_canvas_url("courses", course_id)
   response <- canvas_query(endpoint)
-  content(response, "parsed")
+  httr::content(response, "parsed")
 }
