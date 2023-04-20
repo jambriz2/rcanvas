@@ -33,8 +33,13 @@
 
 #' Get announcements from a Canvas course
 #'
-#' @param course_id The ID of the Canvas course to retrieve announcements from
-#' @return A data frame containing the announcements
+#' @param course_id numeric course id
+# @param start_date Only return announcements posted since the start_date (inclusive). Defaults to 14 days ago. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
+# @param end_date Only return announcements posted before the end_date (inclusive). Defaults to 28 days from start_date. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ. Announcements scheduled for future posting will only be returned to course administrators.
+# @param active_only	Only return active announcements that have been published. Applies only to requesting users that have permission to view unpublished items. Defaults to false for users with access to view unpublished items, otherwise true and unmodifiable.
+#
+#' @return announcements for a given course
+#' @export
 get_announcements <- function(course_id) {
   # Define the endpoint for the announcements
   endpoint <- make_canvas_url("courses", course_id, "discussion_topics")
