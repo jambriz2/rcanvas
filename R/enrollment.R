@@ -34,3 +34,32 @@ add_enrollments <- function(course_id, user_ids, type=c("StudentEnrollment", "Te
 }
 
 
+#' Get course permissions for the authenticated user
+#'
+#' This function returns permission information for the calling user in the given course.
+#'
+#' @param course_id The ID of the course for which you want to get permission information.
+#' @param permissions A vector of permission names to check against the authenticated user.
+#'                    Permission names are documented in the Create a role endpoint.
+#'
+#' @return A named list with permission names and their respective boolean values (TRUE/FALSE).
+#' @import httr
+#' @export
+get_course_permissions <- function(course_id, permissions) {
+  # Check for required parameters
+  if (is.null(course_id) || is.null(permissions)) {
+    stop("Both 'course_id' and 'permissions' are required.")
+  }
+
+  # Build the URL and query arguments
+  url <- make_canvas_url("courses", course_id, "permissions")
+  args <- list(`permissions[]` = permissions)
+
+  # Make the API request
+  resp <- canvas_query(url, args)
+
+  # Process the response and return the data
+  result <- httr::content(resp)
+  return(result)
+}
+
