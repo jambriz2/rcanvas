@@ -51,7 +51,7 @@ get_announcements <- function(course_id, start_date = NULL, end_date = NULL) {
   # Set the required parameters for the API call
   context_code <- paste0("course_", course_id)
   arg <- list(per_page = 100)
-  include <- iter_args_list(context_codes, "context_codes[]")
+  include <- iter_args_list(context_codes[], "context_codes")
   include2 <- iter_args_list(start_date, "start_date")
   include3 <- iter_args_list(end_date, "end_date")
   args <- c(arg, include, include2, include3)
