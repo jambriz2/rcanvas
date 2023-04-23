@@ -58,7 +58,7 @@ get_announcements <- function(course_id, start_date = NULL, end_date = NULL) {
  # args <- list(context_code = "context_codes[]", start_date = "start_date", end_date = "end_date")
 
   # Make the API call
-  response <- canvas_query(endpoint, args)
+  response <- canvas_query(url, args)
 
   # Process the response and convert it to a data frame
   announcements_df <- process_response(url, args)
