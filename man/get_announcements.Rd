@@ -2,7 +2,7 @@
 % Please edit documentation in R/announcements.R
 \name{get_announcements}
 \alias{get_announcements}
-\title{Get announcements for a course}
+\title{Get announcements from a Canvas course}
 \usage{
 get_announcements(
   course_id,
@@ -24,10 +24,9 @@ get_announcements(
 announcements for a given course
 }
 \description{
-We transform the course id from a numeric (e.g. 123) to a context id
-(e.g. course_123).
+Get announcements from a Canvas course
 }
 \examples{
 \dontrun{get_announcements(course_id = 27)}
-\dontrun{get_announcements(course_id = 27, start_date = "2017-02-01")}
+\dontrun{get_announcements(course_id = 27, start_date = "2020-01-01", end_date = "2023-04-22")}
 }

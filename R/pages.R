@@ -9,12 +9,11 @@
 #'
 #' @examples
 #' show_page_front(34232)
-show_wpage_front <- function(course_id){
+show_wpage_front <- function(course_id) {
   # GET /api/v1/courses/:course_id/front_page
-  url <- paste0(canvas_url(), file.path("courses", course_id, "front_page"))
-  resp <- process_response(url, args = "")
+  url <- make_canvas_url("courses", course_id, "front_page")
+  resp <- process_response(url, args = list())
   return(resp)
-
 }
 
 
@@ -28,32 +27,17 @@ show_wpage_front <- function(course_id){
 #'
 duplicate_wpage <- function(course_id, page_url){
   # POST /api/v1/courses/:course_id/pages/:url/duplicate
-  url <- paste0(canvas_url(), file.path("courses", course_id, "pages", page_url, "duplicate"))
+  url <- make_canvas_url("courses", course_id, "pages", page_url, "duplicate")
   resp <- httr::POST(url,
                      httr::user_agent("rcanvas - https://github.com/daranzolin/rcanvas"),
                      httr::add_headers(Authorization = paste("Bearer", check_token())),
-                     body = ""
-                     )
+                     body = list()
+  )
   httr::stop_for_status(resp)
   return(resp)
 }
 
 
-create_wpage_front <- function(){
-  # PUT /api/v1/courses/:course_id/front_page
-
-    # wiki_page[title]		string	The title for the new page. NOTE: changing a page's title will change its url. The updated url will be returned in the result.
-    # wiki_page[body]		  string	The content for the new page.
-    # wiki_page[editing_roles]		string	Which user roles are allowed to edit this page. Any combination of these roles is allowed (separated by commas).
-        # "teachers" Allows editing by teachers in the course.
-        # "students" Allows editing by students in the course.
-        # "members"  For group wikis, allows editing by members of the group.
-        # "public" Allows editing by any user.
-    # wiki_page[notify_of_update]		boolean	  Whether participants should be notified when this page changes.
-    # wiki_page[published]		      boolean	  Whether the page is published (true) or draft state (false).
-
-
-}
 
 #' Get data frame of pages in course
 #'
@@ -68,17 +52,16 @@ create_wpage_front <- function(){
 #' @export
 #'
 get_wpages_list <- function(course_id, sort_type = c("title", "created_at", "updated_at")[1],
-                           order_type = "asc", search = NULL, published = NULL){
+                            order_type = "asc", search = NULL, published = NULL){
   # GET /api/v1/courses/:course_id/pages
-  url <- paste0(canvas_url(), file.path("courses", course_id, "pages"))
+  url <- make_canvas_url("courses", course_id, "pages")
   args_list <- list(sort = sort_type, order = order_type)
-  if(!is.null(search)) args_list <- c(args_list, search_term = search)
-  if(!is.null(published)) args_list <- c(args_list, published = published)
+  if (!is.null(search)) args_list <- c(args_list, search_term = search)
+  if (!is.null(published)) args_list <- c(args_list, published = published)
   args <- sc(args_list)
 
   resp <- process_response(url, args = args)
   return(resp)
-
 }
 
 #' Get data frame of a page in course
@@ -90,8 +73,8 @@ get_wpages_list <- function(course_id, sort_type = c("title", "created_at", "upd
 #' @export
 get_wpage <- function(course_id, page_url){
   # GET /api/v1/courses/:course_id/pages/:url
-  url <- paste0(canvas_url(), file.path("courses", course_id, "pages", page_url))
-  resp <- process_response(url, args = "")
+  url <- make_canvas_url("courses", course_id, "pages", page_url)
+  resp <- process_response(url, args = NULL)
   return(resp)
 }
 
@@ -107,29 +90,30 @@ get_wpage <- function(course_id, page_url){
 #' @return empty
 #' @export
 #'
-create_wpage <- function(course_id, title, body, editing_roles = "teachers", published = FALSE){
+create_wpage <- function(course_id, title, body, editing_roles = "teachers", published = FALSE) {
   # POST /api/v1/courses/:course_id/pages
-  # wiki_page[notify_of_update]	boolean	Whether participants should be notified when this page changes.
-  # wiki_page[front_page]		    boolean	Set an unhidden page as the front page (if true)
-    url <- paste0(canvas_url(), file.path("courses", course_id, "pages"))
-    args <- sc(list(`wiki_page[title]` = title,
-                              `wiki_page[body]` = body,
-                              `wiki_page[editing_roles]` = editing_roles,
-                              `wiki_page[notify_of_update]` = FALSE,
-                              `wiki_page[published]` = published,
-                              `wiki_page[front_page]` = FALSE
-            ))
-    # resp <- httr::POST(url = url,
-    #                    httr::user_agent("rcanvas - https://github.com/daranzolin/rcanvas"),
-    #                    httr::add_headers(Authorization = paste("Bearer", rcanvas:::check_token())),
-    #                    body = args)
-    resp <- canvas_query(url, args, "POST")
+  url <- make_canvas_url("courses", course_id, "pages")
 
-    httr::stop_for_status(resp)
-    message(sprintf("Page '%s' created", title))
-    return(resp)
+  args <- list(wiki_page = sc(list(title = title,
+                                   body = body,
+                                   editing_roles = editing_roles,
+                                   notify_of_update = FALSE,
+                                   published = published,
+                                   front_page = FALSE
+  )))
 
+  json_data <- jsonlite::toJSON(args, auto_unbox = TRUE)
+
+  resp <- httr::POST(url,
+                     httr::user_agent("rcanvas - https://github.com/daranzolin/rcanvas"),
+                     httr::add_headers(Authorization = paste("Bearer", check_token()), 'Content-Type' = 'application/json'),
+                     body = json_data, encode = "json")
+
+  httr::stop_for_status(resp)
+  message(sprintf("Page '%s' created", title))
+  return(resp)
 }
+
 
 #' Update/Create page in course
 #'
@@ -144,25 +128,27 @@ create_wpage <- function(course_id, title, body, editing_roles = "teachers", pub
 #' @return empty
 #' @export
 #'
-update_wpage <- function(course_id, page_url, title = NULL, body = NULL, editing_roles = "teachers", published = FALSE, notify = FALSE){
- # PUT /api/v1/courses/:course_id/pages/:url
-  # wiki_page[front_page]		    boolean	Set an unhidden page as the front page (if true)
-  url <- paste0(canvas_url(), file.path("courses", course_id, "pages", page_url))
-  args_list <- list(`wiki_page[editing_roles]` = editing_roles,
-                    `wiki_page[published]` = published,
-                    `wiki_page[notify_of_update]` = notify,
-                    `wiki_page[front_page]` = FALSE)
-  if(!is.null(title)) args_list <- c(args_list, `wiki_page[title]` = title)
-  if(!is.null(body)) args_list <- c(args_list, `wiki_page[body]` = body)
-  args <- sc(args_list)
-  # resp <- httr::POST(url = url,
-  #                    httr::user_agent("rcanvas - https://github.com/daranzolin/rcanvas"),
-  #                    httr::add_headers(Authorization = paste("Bearer", rcanvas:::check_token())),
-  #                    body = args)
-  resp <- canvas_query(url, args, "PUT")
+update_wpage <- function(course_id, page_url, title = NULL, body = NULL, editing_roles = "teachers", published = FALSE, notify = FALSE) {
+  # PUT /api/v1/courses/:course_id/pages/:url
+  url <- make_canvas_url("courses", course_id, "pages", page_url)
+
+  args_list <- list(editing_roles = editing_roles,
+                    published = published,
+                    notify_of_update = notify,
+                    front_page = FALSE)
+  if (!is.null(title)) args_list <- c(args_list, title = title)
+  if (!is.null(body)) args_list <- c(args_list, body = body)
+
+  args <- list(wiki_page = sc(args_list))
+  json_data <- jsonlite::toJSON(args, auto_unbox = TRUE)
+
+  resp <- httr::PUT(url,
+                    httr::user_agent("rcanvas - https://github.com/daranzolin/rcanvas"),
+                    httr::add_headers(Authorization = paste("Bearer", check_token()), 'Content-Type' = 'application/json'),
+                    body = json_data, encode = "json")
 
   httr::stop_for_status(resp)
-  message(sprintf("Page '%s' created", title))
+  message(sprintf("Page '%s' updated", title))
   return(resp)
 
 }
@@ -185,5 +171,3 @@ delete_wpage <- function(course_id, page_url){
   return(resp)
 
 }
-
-

@@ -23,3 +23,4 @@ get_announcements <- function(course_id, start_date = NULL, end_date = NULL, act
   dat <- process_response(url, args)
   dat
 }
+
