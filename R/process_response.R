@@ -124,3 +124,4 @@ get_page <- function(resp, page) {
   url <- stringr::str_replace_all(url, "[<>;]", "")
   return(url)
 }
+

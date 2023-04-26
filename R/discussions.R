@@ -38,12 +38,13 @@ get_discussions_context <- function(object_id, object_type = "courses",
 #' get_discussion_id(4371405, 1350207)
 get_discussion_id <- function(discussion_id, object_id, object_type = "courses") {
   stopifnot(object_type %in% c("courses", "groups"))
-  url <- make_canvas_url(object_type, object_id, "discussion_topics", discussion_id)
+  url <- make_canvas_url(object_type, object_id, "discussion_topics", discussion_id, "view")
   args <- list(per_page = 100)
   include <- iter_args_list(NULL, "include[]")
   args <- c(args, include)
-  dat <- process_response(url, args)
-  dat
+  raw_data <- canvas_query(url, args, "GET") %>% httr::content("text")
+  data <- jsonlite::fromJSON(raw_data, flatten = TRUE)
+  return(data)
 }
 
 #' * `update_discussion_id`: Update discussion by id
@@ -67,43 +68,35 @@ update_discussion_id <- function(discussion_id, object_id, message,
   canvas_query(url, args, "PUT")
 }
 
-
-
-get_discussion_entries_by_user <- function(course_id, user_id) {
-    # Construct the API endpoint for the course discussions
-    endpoint <- make_canvas_url("courses", course_id, "discussion_topics")
-    
-    # Get the discussion topics
-    response <- canvas_query(endpoint)
-    discussion_topics <- content(response, "parsed")
-    
-    # Function to get entries for a specific discussion topic
-    get_topic_entries <- function(topic_id) {
-        topic_endpoint <- make_canvas_url("courses", course_id, "discussion_topics", topic_id, "entries")
-        topic_response <- canvas_query(topic_endpoint)
-        content(topic_response, "parsed")
-    }    
-  
-    # Get all entries for each discussion topic
-    all_entries <- map(discussion_topics$id, get_topic_entries)
-
-    # Combine all entries into a single data frame
-    all_entries_df <- bind_rows(all_entries)
-
-    # Filter entries by user_id
-    user_entries <- filter(all_entries_df, user_id == user_id)
-
-    return(user_entries)
-}
-
-
-
 #' Get discussion entries by user
 #'
 #' @param course_id The course ID.
 #' @param user_id The user ID.
 #' @return A data frame containing discussion entries for the specified user.
 #' @export
-get_discussion_entries_by_user <- function(course_id, user_id) {
-    # Your function implementation here
+get_discussion_entries <- function(course_id, topic_id) {
+  # Construct the API endpoint for the discussion entries
+  endpoint <- make_canvas_url("courses", course_id, "discussion_topics", topic_id, "entries")
+
+  # Get the first page of discussion entries
+  response <- canvas_query(paste0(endpoint, "?per_page=100"))
+  discussion_entries <- httr::content(response)
+
+  # Get all the pages of discussion entries
+  while (length(response$headers$link) > 0 && grepl("rel=\"next\"", response$headers$link)) {
+    next_page_url <- sub(".*<(.*?)>; rel=\"next\".*", "\\1", response$headers$link)
+    response <- canvas_query(next_page_url)
+    discussion_entries <- rbind(discussion_entries, httr::content(response))
+  }
+
+  # Convert the list of discussion entries to a data frame
+  entries_df <- map_df(discussion_entries, ~ as.data.frame(t(unlist(.x))))
+
+  # Parse the HTML code in each message
+  messages <- entries_df$message
+  messages_parsed <- lapply(messages, function(x) {
+    html_text(read_html(x))
+  })
+  entries_df$message <- messages_parsed
+  return(entries_df)
 }

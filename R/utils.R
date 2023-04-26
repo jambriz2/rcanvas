@@ -130,3 +130,4 @@ test_canvas_api <- function(course_id) {
   response <- canvas_query(endpoint)
   httr::content(response, "parsed")
 }
+

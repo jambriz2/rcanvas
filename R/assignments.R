@@ -18,7 +18,7 @@ get_assignment_list <- function(course_id = NULL) {
 
 }
 
-#' Upload a file to an assignment and submit it
+#' Upload a file to an assignment and submit it - Students Only
 #'
 #' @param course_id Course ID
 #' @param assignment_id Assignment ID

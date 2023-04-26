@@ -34,10 +34,11 @@ get_account_course_list <- function(acc_id = NULL, include = NULL) {
   } else {
     url <- make_canvas_url("courses")
   }
+
   args <- list(
-    per_page = 100,
-    acc_id = acc_id
+    per_page = 100
   )
+
   include <- iter_args_list(include, "include[]")
   args <- c(args, include)
   dat <- process_response(url, args)
@@ -46,9 +47,9 @@ get_account_course_list <- function(acc_id = NULL, include = NULL) {
 
 get_term_course_list <- function(term_id = NULL, acc_id = NULL, include = NULL) {
   if (!is.null(term_id)) {
-    url <- paste0(canvas_url(), paste("accounts/", acc_id, "/courses?enrollment_term_id=", term_id, sep = "" ))
+    url <- make_canvas_url("accounts", acc_id, "courses?enrollment_term_id=", term_id)
   } else {
-    url <- paste0(canvas_url(), paste("accounts", acc_id, "courses", sep = "/"))
+    url <- make_canvas_url("accounts", acc_id, "courses")
   }
   args <- list(
     per_page = 100,
@@ -142,17 +143,41 @@ get_course_items <- function(course_id, item, include = NULL) {
 #' @examples
 #'   \dontrun{search_courses()}
 #'   \dontrun{search_courses(search="big data")}
-search_courses <- function(search=NULL) {
-  url <- paste0(canvas_url(), paste("search", "all_courses", sep = "/"))
-  args = list(per_page=100)
+search_courses <- function(search = NULL) {
+  url <- make_canvas_url("search", "all_courses")
+  args = list(per_page = 100)
   if (!is.null(search)) args["search"] = search
-  resp <- canvas_query(url, args, "GET")
 
-  resp = canvas_query(url, args, "GET") %>%
-    paginate() %>%
-    purrr::map(httr::content, "text") %>%
-    purrr::map(jsonlite::fromJSON, flatten = TRUE) %>%
-    (function(x) x[[1]])
+  resp <- list()
+
+  has_more_results <- TRUE
+  page <- 1
+
+  while (has_more_results) {
+    args["page"] = page
+    page_resp <- canvas_query(url, args, "GET") %>%
+      httr::content("text") %>%
+      jsonlite::fromJSON(flatten = TRUE)
+
+    if (length(page_resp) == 0) {
+      has_more_results <- FALSE
+    } else {
+      if (is.null(nrow(resp))) {
+        resp <- page_resp
+      } else {
+        columns_to_add <- setdiff(names(page_resp), names(resp))
+        for (column in columns_to_add) {
+          resp[[column]] <- NA
+        }
+        columns_to_add <- setdiff(names(resp), names(page_resp))
+        for (column in columns_to_add) {
+          page_resp[[column]] <- NA
+        }
+        resp <- rbind(resp, page_resp)
+      }
+    }
+    page <- page + 1
+  }
 
   return(if (is.null(nrow(resp))) data.frame() else resp)
 }
@@ -168,7 +193,7 @@ search_courses <- function(search=NULL) {
 #' @examples
 #' #' get_outcome_results(course_id = 20)
 get_outcome_results <- function(course_id) {
-  url <- paste0(canvas_url(), paste("courses", course_id, "outcome_results", sep = "/"))
+  url <- make_canvas_url("courses", course_id, "outcome_results")
   args <- list(per_page = 100)
   dat <- process_response(url, args)
 

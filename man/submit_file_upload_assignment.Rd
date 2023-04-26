@@ -2,7 +2,7 @@
 % Please edit documentation in R/assignments.R
 \name{submit_file_upload_assignment}
 \alias{submit_file_upload_assignment}
-\title{Upload a file to an assignment and submit it}
+\title{Upload a file to an assignment and submit it - Students Only}
 \usage{
 submit_file_upload_assignment(
   course_id,
@@ -27,5 +27,5 @@ submit_file_upload_assignment(
 data frame
 }
 \description{
-Upload a file to an assignment and submit it
+Upload a file to an assignment and submit it - Students Only
 }
