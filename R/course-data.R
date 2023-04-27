@@ -18,16 +18,25 @@ get_course_list <- function(user_id = NULL, include = NULL) {
   } else {
     url <- make_canvas_url("courses")
   }
-  args <- list(
-               per_page = 100,
-               user_id = user_id
-               )
+  args <- list(per_page = 100, user_id = user_id)
+
   include <- iter_args_list(include, "include[]")
   args <- c(args, include)
   dat <- process_response(url, args)
   return(unique(dat))
 }
 
+#' @title Function to list courses for a specific account or all courses.
+#'
+#' @param acc_id Optional argument to specify courses for a specific account id
+#' @param include Optional argument to specify additional information
+#'
+#' @return data frame
+#' @export
+#'
+#' @examples
+#' #' get_account_course_list()
+#' #' get_account_course_list(acc_id = 123)
 get_account_course_list <- function(acc_id = NULL, include = NULL) {
   if (!is.null(acc_id)) {
     url <- make_canvas_url("accounts", acc_id, "courses")
@@ -35,26 +44,8 @@ get_account_course_list <- function(acc_id = NULL, include = NULL) {
     url <- make_canvas_url("courses")
   }
 
-  args <- list(
-    per_page = 100
-  )
+  args <- list(per_page = 100)
 
-  include <- iter_args_list(include, "include[]")
-  args <- c(args, include)
-  dat <- process_response(url, args)
-  return(unique(dat))
-}
-
-get_term_course_list <- function(term_id = NULL, acc_id = NULL, include = NULL) {
-  if (!is.null(term_id)) {
-    url <- make_canvas_url("accounts", acc_id, "courses?enrollment_term_id=", term_id)
-  } else {
-    url <- make_canvas_url("accounts", acc_id, "courses")
-  }
-  args <- list(
-    per_page = 100,
-    term_id = term_id
-  )
   include <- iter_args_list(include, "include[]")
   args <- c(args, include)
   dat <- process_response(url, args)
@@ -131,7 +122,52 @@ get_course_items <- function(course_id, item, include = NULL) {
     dplyr::mutate(course_id = course_id)
 }
 
-#' @importFrom magrittr %>%
+#' @title Get course permissions for the authenticated user
+#'
+#' @description This function returns permission information for the calling user in the given course.
+#'
+#' @param course_id The ID of the course for which you want to get permission information.
+#' @param permissions A vector of permission names to check against the authenticated user.
+#'                    Permission names are documented in the Create a role endpoint.
+#'
+#' @return A named list with permission names and their respective boolean values (TRUE/FALSE).
+#' @import httr
+#' @export
+get_course_permissions <- function(course_id, permissions = NULL) {
+  url <- make_canvas_url("courses", course_id, "permissions")
+
+  # Prepare the permissions parameter
+  if (!is.null(permissions)) {
+    permissions_arg <- paste0("permissions[]=", permissions, collapse = "&")
+  } else {
+    permissions_arg <- NULL
+  }
+
+  args <- list(permissions = permissions_arg)
+  args <- sc(args)
+
+  dat <- process_response(url, args)
+  dat
+}
+
+#' @title Function to return course outcome results.
+#'
+#' @description Returns a data.frame containing course outcome results.
+#'
+#' @param course_id A valid Canvas course id
+#' @return data frame
+#' @export
+#'
+#' @examples
+#' #' get_outcome_results(course_id = 20)
+get_outcome_results <- function(course_id) {
+  url <- make_canvas_url("courses", course_id, "outcome_results")
+  args <- list(per_page = 100)
+  dat <- process_response(url, args)
+
+  return(unique(dat))
+}
+
 #' @title Search all courses
 #'
 #' @description Returns a data.frame of all public courses (optoinally matching the search term)
@@ -180,22 +216,4 @@ search_courses <- function(search = NULL) {
   }
 
   return(if (is.null(nrow(resp))) data.frame() else resp)
-}
-
-#' @title Function to return course outcome results.
-#'
-#' @description Returns a data.frame containing course outcome results.
-#'
-#' @param course_id A valid Canvas course id
-#' @return data frame
-#' @export
-#'
-#' @examples
-#' #' get_outcome_results(course_id = 20)
-get_outcome_results <- function(course_id) {
-  url <- make_canvas_url("courses", course_id, "outcome_results")
-  args <- list(per_page = 100)
-  dat <- process_response(url, args)
-
-  return(unique(dat))
 }

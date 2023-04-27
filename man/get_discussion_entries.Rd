@@ -4,12 +4,12 @@
 \alias{get_discussion_entries}
 \title{Get discussion entries by user}
 \usage{
-get_discussion_entries(course_id, topic_id)
+get_discussion_entries(course_id, discussion_id)
 }
 \arguments{
 \item{course_id}{The course ID.}
 
-\item{user_id}{The user ID.}
+\item{discussion_id}{The discussion ID.}
 }
 \value{
 A data frame containing discussion entries for the specified user.

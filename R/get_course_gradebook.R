@@ -1,4 +1,4 @@
-#' Get a course gradebook
+#' @title Get a course gradebook
 #'
 #' @importFrom magrittr %>%
 #'

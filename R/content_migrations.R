@@ -1,4 +1,4 @@
-#' Create a course content migration
+#'  @title Create a course content migration
 #'
 #' @param course_id a valid course id (the course to copy content into)
 #' @param migration_type Migration type. Default allowed values: canvas_cartridge_importer, common_cartridge_importer,

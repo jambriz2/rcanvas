@@ -1,4 +1,4 @@
-#' Get announcements from a Canvas course
+#' @title Get announcements from a Canvas course
 #'
 #' @param course_id numeric course id
 #' @param start_date Only return announcements posted since the start_date (inclusive). Defaults to 14 days ago. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.

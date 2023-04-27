@@ -1,4 +1,4 @@
-#' Create a course
+#' @title Create a course
 #'
 #' @param account_id a valid account id
 #' @param name The name of the course. If omitted, the course will be named “Unnamed Course.”

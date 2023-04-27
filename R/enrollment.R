@@ -32,33 +32,3 @@ add_enrollments <- function(course_id, user_ids, type=c("StudentEnrollment", "Te
   state <- match.arg(state)
   invisible(purrr::map2(course_id, user_ids, add_enrollment, type=type, state=state, section=section, ...))
 }
-
-
-#' Get course permissions for the authenticated user
-#'
-#' This function returns permission information for the calling user in the given course.
-#'
-#' @param course_id The ID of the course for which you want to get permission information.
-#' @param permissions A vector of permission names to check against the authenticated user.
-#'                    Permission names are documented in the Create a role endpoint.
-#'
-#' @return A named list with permission names and their respective boolean values (TRUE/FALSE).
-#' @import httr
-#' @export
-get_course_permissions <- function(course_id, permissions = NULL) {
-  url <- make_canvas_url("courses", course_id, "permissions")
-
-  # Prepare the permissions parameter
-  if (!is.null(permissions)) {
-    permissions_arg <- paste0("permissions[]=", permissions, collapse = "&")
-  } else {
-    permissions_arg <- NULL
-  }
-
-  args <- list(permissions = permissions_arg)
-  args <- sc(args)
-
-  dat <- process_response(url, args)
-  dat
-}
-

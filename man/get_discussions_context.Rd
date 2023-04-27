@@ -37,8 +37,6 @@ silently sends put request and updates
 }
 \description{
 A group of functions which deal with \href{https://canvas.instructure.com/doc/api/discussion_topics.html}{discussion topics}.
-}
-\details{
 \itemize{
 \item \code{get_discussions_context}: get all discussions belonging to a course or group. Note that theoretically this should include announcements, as they are technically discussions, but does not. Use \code{get_announcements} instead.
 }

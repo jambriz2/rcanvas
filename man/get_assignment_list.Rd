@@ -2,7 +2,7 @@
 % Please edit documentation in R/assignments.R
 \name{get_assignment_list}
 \alias{get_assignment_list}
-\title{Function to list all assignments.}
+\title{Function to list all assignments}
 \usage{
 get_assignment_list(course_id = NULL)
 }
@@ -13,7 +13,7 @@ get_assignment_list(course_id = NULL)
 data frame
 }
 \description{
-Function to list all assignments.
+Function to list all assignments
 }
 \examples{
 #' get_assignment_list()

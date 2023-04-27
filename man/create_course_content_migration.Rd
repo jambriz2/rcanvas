@@ -2,7 +2,7 @@
 % Please edit documentation in R/content_migrations.R
 \name{create_course_content_migration}
 \alias{create_course_content_migration}
-\title{Create a course content migration}
+\title{@title Create a course content migration}
 \usage{
 create_course_content_migration(
   course_id,
@@ -61,7 +61,7 @@ course_copy_importer, zip_file_importer, qti_converter, moodle_converter}
 invisible
 }
 \description{
-Create a course content migration
+@title Create a course content migration
 }
 \examples{
 \dontrun{create_course_content_migration(course_id = 1532751, source_course_id = 1532594)}
