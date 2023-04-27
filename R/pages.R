@@ -1,7 +1,5 @@
-# https://canvas.instructure.com/doc/api/pages.html
-#
 
-#' Show Front Page
+#' @title Show Front Page
 #'
 #' @param course_id a valid course id
 #' @return data.frame with front page information
@@ -16,8 +14,7 @@ show_wpage_front <- function(course_id) {
   return(resp)
 }
 
-
-#' Duplicate course page
+#' @title Duplicate course page
 #'
 #' @param course_id a valid course id
 #' @param page_url name of the page url. Just the final portion.
@@ -37,9 +34,7 @@ duplicate_wpage <- function(course_id, page_url){
   return(resp)
 }
 
-
-
-#' Get data frame of pages in course
+#' @title Get data frame of pages in course
 #'
 #' @param course_id a valid course id
 #' @param sort_type a string, Sort results by this field.  Allowed values: 'title',
@@ -64,7 +59,7 @@ get_wpages_list <- function(course_id, sort_type = c("title", "created_at", "upd
   return(resp)
 }
 
-#' Get data frame of a page in course
+#' @title Get data frame of a page in course
 #'
 #' @param course_id a valid course id
 #' @param page_url a valid page url.
@@ -79,7 +74,7 @@ get_wpage <- function(course_id, page_url){
 }
 
 
-#' Create page in course
+#' @title Create page in course
 #'
 #' @param course_id a valid course id
 #' @param title a string.  The title for the new page.
@@ -114,8 +109,7 @@ create_wpage <- function(course_id, title, body, editing_roles = "teachers", pub
   return(resp)
 }
 
-
-#' Update/Create page in course
+#' @title Update/Create page in course
 #'
 #' @param course_id a valid course id
 #' @param page_url a valid page url.
@@ -150,10 +144,9 @@ update_wpage <- function(course_id, page_url, title = NULL, body = NULL, editing
   httr::stop_for_status(resp)
   message(sprintf("Page '%s' updated", title))
   return(resp)
-
 }
 
-#' Delete page from course
+#' @title Delete page from course
 #'
 #' @param course_id a valid course id
 #' @param page_url a valid page url.
@@ -163,11 +156,26 @@ update_wpage <- function(course_id, page_url, title = NULL, body = NULL, editing
 #'
 delete_wpage <- function(course_id, page_url){
   # DELETE /api/v1/courses/:course_id/pages/:url
-  url <- paste0(canvas_url(), file.path("courses", course_id, "pages", page_url))
+  url <-  make_canvas_url("courses", course_id, "pages", page_url)
   resp <- canvas_query(url, type = "DELETE")
 
   httr::stop_for_status(resp)
   message(sprintf("Page '%s' deleted", page_url))
   return(resp)
+}
 
+#' @title Retrieve a list of modules for a specific course
+#'
+#' @param course_id A valid course ID.
+#'
+#' @return A list containing the modules associated with the specified course.
+#' @export
+#'
+#' @examples
+#' \dontrun{modules <- list_modules(12345)}
+list_modules <- function(course_id){
+  # GET /api/v1/courses/:course_id/modules
+  url <- make_canvas_url("courses", course_id, "modules")
+  resp <- process_response(url, args = "")
+  return(resp)
 }

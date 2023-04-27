@@ -1,4 +1,4 @@
-#' Submission functions
+#' @title Submission functions
 #' @param course_id A valid canvas course id
 #' @param type Either "quizzes" or "assignments"
 #' @param type_id A valid quiz or assignment id
@@ -49,7 +49,7 @@ get_submission_single <- function(course_id, type, type_id, user_id) {
   df[[1]]
 }
 
-#' Respond to submission
+#' @title Respond to submission
 #'
 #' See [Canvas API Documentation](https://canvas.instructure.com/doc/api/submissions.html#method.submissions_api.update).
 #'
