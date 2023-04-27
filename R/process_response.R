@@ -21,9 +21,44 @@ process_response <- function(url, args) {
     purrr::map(jsonlite::fromJSON, flatten = TRUE)
 
   # flatten to data.frame if able, otherwise return as is
-  #d <- tryCatch(purrr::map_df(d, purrr::flatten_df),
-  #              error = function(e) d)
+  d <- tryCatch(purrr::map_df(d, purrr::flatten_df),
+               error = function(e) d)
   dplyr::bind_rows(d)
+}
+
+process_response_rubrics <- function(url, args) {
+
+  resp <- canvas_query(url, args, "GET")
+
+  d <- paginate(resp) %>%
+    purrr::map(httr::content, "text") %>%
+    purrr::map(jsonlite::fromJSON, flatten = TRUE)
+
+  # Handle rubric data
+  d <- purrr::map(d, function(x) {
+    if (!is.null(x$rubric)) {
+      rubric_data <- x$rubric %>%
+        as.data.frame() %>%
+        tibble::rowid_to_column("criterion_id") %>%
+        dplyr::select(criterion_id, id, description, points)
+
+      x$rubric <- NULL
+    } else {
+      rubric_data <- NULL
+    }
+    return(list(assignment_data = x, rubric_data = rubric_data))
+  })
+
+  # Filter out rubric_data NULL values
+  d <- purrr::keep(d, ~ !is.null(.x$rubric_data))
+
+  # Flatten the assignment data
+  assignment_data <- purrr::map_df(d, "assignment_data")
+
+  # Add rubric_data as a list column
+  assignment_data$rubric_data <- purrr::map(d, "rubric_data")
+
+  return(assignment_data)
 }
 
 #' Get responses from Canvas API pages
