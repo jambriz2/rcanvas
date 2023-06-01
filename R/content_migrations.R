@@ -1,24 +1,26 @@
 #'  @title Create a course content migration
 #'
-#' @param course_id a valid course id (the course to copy content into)
-#' @param migration_type Migration type. Default allowed values: canvas_cartridge_importer, common_cartridge_importer,
-#' course_copy_importer, zip_file_importer, qti_converter, moodle_converter
-#' @param name Required if uploading a file. This is the first step in uploading a file to the content migration.
-#' @param file_url A URL to download the file from. Must not require authentication.
-#' @param source_course_id a valid course id (the course to copy content from)
-#' @param folder_id The folder to unzip the .zip file into for a zip_file_import.
-#' @param overwrite_quizzes boolean, Whether to overwrite quizzes with the same identifiers between content packages.
-#' @param question_bank_id The existing question bank ID to import questions into if not specified in the content package.
-#' @param question_bank_name The question bank to import questions into if not specified in the content package, if both bank id and name are set, id will take precedence.
-#' @param shift_dates boolean, Whether to shift dates in the copied course
-#' @param old_start_date The original start date of the source content/course
-#' @param old_end_date The original end date of the source content/course
-#' @param new_start_date The new start date for the content/course
-#' @param new_end_date The new end date for the content/course
-#' @param day_substitutions Move anything scheduled for day 'X' to the specified day. (0-Sunday, 1-Monday, 2-Tuesday, 3-Wednesday, 4-Thursday, 5-Friday, 6-Saturday)
-#' @param remove_dates boolean, Whether to remove dates in the copied course. Cannot be used in conjunction with shift_dates.
+#' @description This function creates a course content migration in Canvas. It allows you to copy content from a source course to a destination course.
 #'
-#' @return invisible
+#' @param course_id The ID of the course for which you want to get permission information. (Integer)
+#' @param migration_type Migration type. Allowed values: canvas_cartridge_importer, common_cartridge_importer, course_copy_importer, zip_file_importer, qti_converter, moodle_converter (String)
+#' @param name Required if uploading a file. This is the first step in uploading a file to the content migration. (String)
+#' @param file_url A URL to download the file from. Must not require authentication. (String)
+#' @param source_course_id The ID of the source course to copy content from (Integer)
+#' @param folder_id The folder to unzip the .zip file into for a zip_file_import. (Integer)
+#' @param overwrite_quizzes Whether to overwrite quizzes with the same identifiers between content packages. (Boolean)
+#' @param question_bank_id The existing question bank ID to import questions into if not specified in the content package. (Integer)
+#' @param question_bank_name The question bank to import questions into if not specified in the content package. If both bank ID and name are set, the ID will take precedence. (String)
+#' @param shift_dates Whether to shift dates in the copied course. (Boolean)
+#' @param old_start_date The original start date of the source course. The value should be formatted as: yyyy-mm-dd. (String)
+#' @param old_end_date The original end date of the source course. The value should be formatted as: yyyy-mm-dd. (String)
+#' @param new_start_date The new start date for the course. The value should be formatted as: yyyy-mm-dd. (String)
+#' @param new_end_date The new end date for the course. (String)
+#' @param day_substitutions Move anything scheduled for day 'X' to the specified day. Days: 0-Sunday, 1-Monday, 2-Tuesday, 3-Wednesday, 4-Thursday, 5-Friday, 6-Saturday. (Integer)
+#' @param remove_dates Whether to remove dates in the copied course. Cannot be used in conjunction with shift_dates. (Boolean)
+#'
+#' @return Invisible
+#' @import httr
 #' @export
 #'
 #' @examples

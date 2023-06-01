@@ -1,44 +1,53 @@
 #' @title Create a course
 #'
-#' @param account_id a valid account id
-#' @param name The name of the course. If omitted, the course will be named “Unnamed Course.”
-#' @param course_code The course code for the course.
-#' @param start_at Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
-#' @param end_at Course end date in ISO8601 format, e.g. 2011-01-01T01:00Z
-#' @param license The name of the licensing. Should be one of the following abbreviations (a descriptive name is included in parenthesis for reference): 'private' (Private Copyrighted)
-#' 'cc_by_nc_nd' (CC Attribution Non-Commercial No Derivatives) 'cc_by_nc_sa' (CC Attribution Non-Commercial Share Alike)
-#' 'cc_by_nc' (CC Attribution Non-Commercial) 'cc_by_nd' (CC Attribution No Derivatives) 'cc_by_sa' (CC Attribution Share Alike)
-#' 'cc_by' (CC Attribution) 'public_domain' (Public Domain).
-#' @param is_public boolean, Set to true if course is public to both authenticated and unauthenticated users.
-#' @param is_public_to_auth_users boolean, Set to true if course is public only to authenticated users.
-#' @param public_syllabus boolean, Set to true to make the course syllabus public.
-#' @param public_syllabus_to_auth boolean, Set to true to make the course syllabus public for authenticated users.
-#' @param public_description A publicly visible description of the course.
-#' @param allow_student_wiki_edits boolean, If true, students will be able to modify the course wiki.
-#' @param allow_wiki_comments boolean, If true, course members will be able to comment on wiki pages.
-#' @param allow_student_forum_attachments boolean, If true, students can attach files to forum posts.
-#' @param open_enrollment boolean, Set to true if the course is open enrollment.
-#' @param self_enrollment boolean, Set to true if the course is self enrollment.
-#' @param restrict_enrollments_to_course_dates boolean, Set to true to restrict user enrollments to the start and end dates of the course.
-#' @param term_id The unique ID of the term to create to course in.
-#' @param sis_course_id The unique SIS identifier.
-#' @param integration_id The unique Integration identifier.
-#' @param hide_final_grades boolean, If this option is set to true, the totals in student grades summary will be hidden.
-#' @param apply_assignment_group_weights boolean, Set to true to weight final grade based on assignment groups percentages.
-#' @param time_zone The time zone for the course. Allowed time zones are IANA time zones or friendlier Ruby on Rails time zones.
-#' @param offer boolean, If this option is set to true, the course will be available to students immediately.
-#' @param enroll_me boolean, Set to true to enroll the current user as the teacher.
-#' @param default_view The type of page that users will see when they first visit the course. Options: 'feed', 'wiki', 'modules', syllabus', 'assignments'
-#' @param syllabus_body The syllabus body for the course
-#' @param grading_standard_id The grading standard id to set for the course. If no value is provided for this argument the current grading_standard will be un-set from this course.
-#' @param course_format Optional. Specifies the format of the course. (Should be 'on_campus', 'online', or 'blended')
-#' @param enable_sis_activation When true, will first try to re-activate a deleted course with matching sis_course_id if possible.
+#' @description This function creates a new course with the specified parameters.
 #'
-#' @return invisible
+#' @param account_id The ID of the account in which to create the course. (Integer)
+#' @param name The name of the course. If omitted, the course will be named "Unnamed Course". (String)
+#' @param course_code The course code for the course. (String)
+#' @param start_at The course start date in ISO8601 format, e.g., 2011-01-01T01:00Z (String)
+#' @param end_at The course end date in ISO8601 format, e.g., 2011-01-01T01:00Z (String)
+#' @param license The name of the licensing. Should be one of the following abbreviations:
+#'   'private' - Private Copyrighted,
+#'   'cc_by_nc_nd' - CC Attribution Non-Commercial No Derivatives,
+#'   'cc_by_nc_sa' - CC Attribution Non-Commercial Share Alike,
+#'   'cc_by_nc' - CC Attribution Non-Commercial,
+#'   'cc_by_nd' - CC Attribution No Derivatives,
+#'   'cc_by_sa' - CC Attribution Share Alike,
+#'   'cc_by' - CC Attribution,
+#'   'public_domain' - Public Domain (String)
+#' @param is_public Set to TRUE if the course is public to both authenticated and unauthenticated users. (Boolean)
+#' @param is_public_to_auth_users Set to TRUE if the course is public only to authenticated users. (Boolean)
+#' @param public_syllabus Set to TRUE to make the course syllabus public. (Boolean)
+#' @param public_syllabus_to_auth Set to TRUE to make the course syllabus public for authenticated users. (Boolean)
+#' @param public_description A publicly visible description of the course. (String)
+#' @param allow_student_wiki_edits If TRUE, students will be able to modify the course wiki. (Boolean)
+#' @param allow_wiki_comments If TRUE, course members will be able to comment on wiki pages. (Boolean)
+#' @param allow_student_forum_attachments If TRUE, students can attach files to forum posts. (Boolean)
+#' @param open_enrollment Set to TRUE if the course is open enrollment. (Boolean)
+#' @param self_enrollment Set to TRUE if the course is self enrollment. (Boolean)
+#' @param restrict_enrollments_to_course_dates Set to TRUE to restrict user enrollments to the start and end dates of the course. (Boolean)
+#' @param term_id The unique ID of the term in which to create the course. (Integer)
+#' @param sis_course_id The unique SIS identifier. (String)
+#' @param integration_id The unique Integration identifier. (String)
+#' @param hide_final_grades If TRUE, the totals in the student grades summary will be hidden. (Boolean)
+#' @param apply_assignment_group_weights Set to TRUE to weight final grade based on assignment groups percentages. (Boolean)
+#' @param time_zone The time zone for the course. Allowed time zones are IANA time zones or friendlier Ruby on Rails time zones. (String)
+#' @param offer If TRUE, the course will be available to students immediately. (Boolean)
+#' @param enroll_me If TRUE, the current user will be enrolled as the teacher. (Boolean)
+#' @param default_view The type of page that users will see when they first visit the course. Options:
+#'   'feed', 'wiki', 'modules', 'syllabus', 'assignments' (String)
+#' @param syllabus_body The syllabus body for the course. (String)
+#' @param grading_standard_id The grading standard ID to set for the course. If no value is provided, the current grading_standard will be un-set from this course. (String)
+#' @param course_format Specifies the format of the course. Should be one of the following:
+#'   'on_campus', 'online', or 'blended'. (String)
+#' @param enable_sis_activation When TRUE, will first try to re-activate a deleted course with a matching sis_course_id if possible. (Boolean)
+#'
+#' @return Invisible
 #' @export
 #'
 #' @examples
-#' \dontrun{create_canvas_course(account_id = 32243, name = "Soren Kierkegaard")}
+#' create_canvas_course(account_id = 123, name = "David Ranzolin")
 create_canvas_course <- function(account_id,
                                  name = NULL,
                                  course_code = NULL,

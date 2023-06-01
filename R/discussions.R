@@ -1,19 +1,16 @@
 #' @title Discussion functions
 #'
-#' @description A group of functions which deal with [discussion topics](https://canvas.instructure.com/doc/api/discussion_topics.html).
+#' @description This group of functions deals with [discussion topics](https://canvas.instructure.com/doc/api/discussion_topics.html). This retrieves all discussions belonging to a course or group. Note that theoretically this should include announcements, as they are technically discussions, but it does not. Use `get_announcements` instead.
 #'
-#' * `get_discussions_context`: get all discussions belonging to a course or group. Note that theoretically this should include announcements, as they are technically discussions, but does not. Use `get_announcements` instead.
+#' @param course_id The ID of the course for which you want to get permission information. (Integer)
+#' @param object_type The type of object. Should be either "courses" or "groups". (String)
+#' @param include If "all_dates" is passed, all dates associated with graded discussions' assignments will be included. (String)
 #'
-#' @param object_id course or group id
-#' @param object_type "courses" or "groups"
-#' @param include If "all_dates" is passed, all dates associated with graded discussions' assignments will be included.
-#'
-#' @return discussions belonging to requested context
+#' @return A data frame containing discussions belonging to the requested context.
 #' @export
-#' @md
 #'
 #' @examples
-#' get_discussions_context(4371405)
+#' get_discussions_context(object_id = 123)
 get_discussions_context <- function(object_id, object_type = "courses",
                                     include = NULL) {
   stopifnot(object_type %in% c("courses", "groups"))
@@ -25,16 +22,19 @@ get_discussions_context <- function(object_id, object_type = "courses",
   dat
 }
 
-#' @title Get single discussion by id
+#' @title Get single discussion by ID
 #'
-#' @param discussion_id  specific id of discussion to get/update
-#' @rdname get_discussions_context
-#' @return single discussion
+#' @description Retrieves a single discussion topic by its ID.
+#'
+#' @param discussion_id The specific ID of the discussion topic to get. (Integer)
+#' @param object_id The ID of the course or group. (Integer)
+#' @param object_type The type of object. Should be either "courses" or "groups". (String)
+#'
+#' @return A data frame containing the details of the single discussion topic.
 #' @export
-#' @md
 #'
 #' @examples
-#' get_discussion_id(4371405, 1350207)
+#' get_discussion_id(discussion_id = 123, object_id = 123)
 get_discussion_id <- function(discussion_id, object_id, object_type = "courses") {
   stopifnot(object_type %in% c("courses", "groups"))
   url <- make_canvas_url(object_type, object_id, "discussion_topics", discussion_id, "view")
@@ -46,17 +46,20 @@ get_discussion_id <- function(discussion_id, object_id, object_type = "courses")
   return(data)
 }
 
-#' @title Update discussion by id
+#' @title Update discussion by ID
 #'
-#' @param message new body of discussion id
+#' @description Updates the body of a discussion topic by its ID.
 #'
-#' @rdname get_discussions_context
-#' @return silently sends put request and updates
+#' @param discussion_id The specific ID of the discussion topic to update. (Integer)
+#' @param object_id The ID of the course or group. (Integer)
+#' @param message The new body of the discussion topic. (String)
+#' @param object_type The type of object. Should be either "courses" or "groups". (String)
+#'
+#' @return This function silently sends a PUT request to update the discussion topic.
 #' @export
-#' @md
 #'
 #' @examples
-#' update_discussion_id(4371405, 1350207, newtext)
+#' update_discussion_id(discussion_id = 123, object_id = 123, "Hello")
 update_discussion_id <- function(discussion_id, object_id, message,
                                  object_type = "courses") {
   stopifnot(object_type %in% c("courses", "groups"))
@@ -69,15 +72,16 @@ update_discussion_id <- function(discussion_id, object_id, message,
 
 #' @title Get discussion entries by user
 #'
-#' @param course_id The course ID.
-#' @param discussion_id The discussion ID.
+#' @param course_id The ID of the course for which you want to get permission information. (Integer)
+#' @param discussion_id The specific ID of the discussion topic to get. (Integer)
+#'
 #' @return A data frame containing discussion entries for the specified user.
 #' @export
+#'
+#' @examples
+#' get_discussion_entries(course_id = 123, discussion_id = 123)
 get_discussion_entries <- function(course_id, discussion_id) {
-  # Construct the API endpoint for the discussion entries
   endpoint <- make_canvas_url("courses", course_id, "discussion_topics", discussion_id, "entries")
-
-  # Get the first page of discussion entries
   response <- canvas_query(paste0(endpoint, "?per_page=100"))
   discussion_entries <- httr::content(response)
 
@@ -88,10 +92,8 @@ get_discussion_entries <- function(course_id, discussion_id) {
     discussion_entries <- rbind(discussion_entries, httr::content(response))
   }
 
-  # Convert the list of discussion entries to a data frame
-  entries_df <- map_df(discussion_entries, ~ as.data.frame(t(unlist(.x)))) %>% select(1:13)
-
   # Parse the HTML code in each message
+  entries_df <- map_df(discussion_entries, ~ as.data.frame(t(unlist(.x)))) %>% select(1:13)
   messages <- entries_df$message
   messages_parsed <- lapply(messages, function(x) {
     html_text(read_html(x))
@@ -102,16 +104,19 @@ get_discussion_entries <- function(course_id, discussion_id) {
 
 #' @title Get discussion entries by user
 #'
-#' @param course_id The course ID.
-#' @param discussion_id The discussion ID.
-#' @param user_id The user ID.
+#' @description Retrieves all discussion entries for a specific user in a course and discussion topic.
+#'
+#' @param course_id The ID of the course for which you want to get permission information. (Integer)
+#' @param discussion_id The specific ID of the discussion topic to get. (Integer)
+#' @param user_id A valid user id. (Integer)
+#'
 #' @return A data frame containing discussion entries for the specified user.
 #' @export
+#'
+#' @examples
+#' get_discussion_entries_by_user(course_id = 123, discussion_id = 123, user_id = 123)
 get_discussion_entries_by_user <- function(course_id, discussion_id, user_id) {
-  # Construct the API endpoint for the discussion entries
   endpoint <- make_canvas_url("courses", course_id, "discussion_topics", discussion_id, "entries")
-
-  # Get the first page of discussion entries
   response <- canvas_query(paste0(endpoint, "?per_page=100"))
   discussion_entries <- httr::content(response)
 
@@ -122,10 +127,8 @@ get_discussion_entries_by_user <- function(course_id, discussion_id, user_id) {
     discussion_entries <- rbind(discussion_entries, httr::content(response))
   }
 
-  # Convert the list of discussion entries to a data frame
-  entries_df <- map_df(discussion_entries, ~ as.data.frame(t(unlist(.x)))) %>% select(1:13)
-
   # Parse the HTML code in each message
+  entries_df <- map_df(discussion_entries, ~ as.data.frame(t(unlist(.x)))) %>% select(1:13)
   messages <- entries_df$message
   messages_parsed <- lapply(messages, function(x) {
     html_text(read_html(x))

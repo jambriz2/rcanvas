@@ -1,17 +1,19 @@
 #' @importFrom magrittr %>%
 #'
-#' @title Function to list all courses.
+#' @title Get all courses
 #'
-#' @param user_id Optional argument to specify courses for specific user id
-#' @param include Optional argument to specify additional information such as "teachers", "total_students", etc.
+#' @description This function retrieves a list of all courses in Canvas.
 #'
-#' @return data frame
+#' @param user_id Optional argument to specify courses for a specific user ID. (Integer)
+#' @param include Optional argument to specify additional information to include, such as "teachers", "total_students", etc. (String)
+#'
+#' @return A data frame with the details of all courses.
 #' @export
 #'
 #' @examples
-#' #' get_course_list()
-#' #' get_course_list(user_id = 366)
-#' #' get_course_list(include = c("teachers", "total_students"))
+#' get_course_list()
+#' get_course_list(user_id = 123)
+#' get_course_list(include = c("teachers", "total_students"))
 get_course_list <- function(user_id = NULL, include = NULL) {
   if (!is.null(user_id)) {
     url <- make_canvas_url("users", user_id, "courses")
@@ -26,20 +28,22 @@ get_course_list <- function(user_id = NULL, include = NULL) {
   return(unique(dat))
 }
 
-#' @title Function to list courses for a specific account or all courses.
+#' @title Get courses for a specific account or all courses
 #'
-#' @param acc_id Optional argument to specify courses for a specific account id
-#' @param include Optional argument to specify additional information
+#' @description This function retrieves a list of courses for a specific account or all courses in Canvas.
 #'
-#' @return data frame
+#' @param account_id Optional argument to specify courses for a specific account ID. (Integer).
+#' @param include Optional argument to specify additional information to include. (String).
+#'
+#' @return A data frame with the details of the courses.
 #' @export
 #'
 #' @examples
-#' #' get_account_course_list()
-#' #' get_account_course_list(acc_id = 123)
-get_account_course_list <- function(acc_id = NULL, include = NULL) {
-  if (!is.null(acc_id)) {
-    url <- make_canvas_url("accounts", acc_id, "courses")
+#' get_account_course_list()
+#' get_account_course_list(account_id = 123)
+get_account_course_list <- function(account_id = NULL, include = NULL) {
+  if (!is.null(account_id)) {
+    url <- make_canvas_url("accounts", account_id, "courses")
   } else {
     url <- make_canvas_url("courses")
   }
@@ -52,22 +56,21 @@ get_account_course_list <- function(acc_id = NULL, include = NULL) {
   return(unique(dat))
 }
 
-#' @title Function to return course analytics data.
+#' @title Get course analytics data
 #'
-#' @description Returns a data.frame of course analytics data. Note: if an individual's user_id is specified,
-#' the function will return a list.
+#' @description This function retrieves course analytics data and returns a data frame or a list if an individual's user_id is specified.
 #'
-#' @param course_id A valid Canvas course id
-#' @param type One of "assignments", "activity", or "student_summaries"
-#' @param user_id Optional argument to specify type analytics for individual user id
+#' @param course_id The ID of the course for which you want to get permission information. (Integer)
+#' @param type One of "assignments", "activity", or "student_summaries". (String)
+#' @param user_id Optional argument to specify courses for a specific user ID. (Integer)
 #'
-#' @return data frame or list if user_id is specified
+#' @return A data frame or a list if user_id is specified.
 #' @export
 #'
 #' @examples
-#' #' get_course_analytics_data(course_id = 20)
-#' #' get_course_analytics_data(course_id = 17, type = "activity")
-#' #' get_course_analytics_data(course_id = 17, type = "student_summaries", user_id = 366)
+#' #' get_course_analytics_data(course_id = 123)
+#' #' get_course_analytics_data(course_id = 123, type = "activity")
+#' #' get_course_analytics_data(course_id = 123, type = "student_summaries", user_id = 123)
 get_course_analytics_data <- function(course_id, type = "assignments", user_id = NULL) {
   if (!is.null(user_id)) {
     url <- make_canvas_url("courses", course_id, "analytics/users", user_id, type)
@@ -87,21 +90,22 @@ get_course_analytics_data <- function(course_id, type = "assignments", user_id =
   jsonlite::fromJSON(json, flatten = TRUE)
 }
 
-#' @title Function to return various course items.
+#' @title Get various course items
 #'
 #' @description Returns a data.frame of various course items. See "item" argument below. Omitting the "item argument
 #' returns a course object.
 #'
-#' @param course_id A valid Canvas course id
-#' @param item Optional -- one of "settings", "discussion_topics", "todo", "enrollments", "features", "files", "modules", "front_page", "pages", "quizzes", "folders".
-#' @param include Optional additions to the query string
-#' @return data frame
+#' @param course_id The ID of the course for which you want to get permission information. (Integer)
+#' @param item Optional argument to specify list "settings", "discussion_topics", "todo", "enrollments", "features", "files", "modules", "front_page", "pages", "quizzes", "folders". (String)
+#' @param include Optional argument to specify additional information to include. (String)
+#'
+#' @return A data frame containing the requested course items.
 #' @export
 #'
 #' @examples
-#' #' get_course_items(course_id = 20, item = "settings")
-#' #' get_course_items(course_id = 20, item = "enrollments")
-#' #' get_course_items(20, item = "users", include = "email")
+#' #' get_course_items(course_id = 123, item = "settings")
+#' #' get_course_items(course_id = 123, item = "enrollments")
+#' #' get_course_items(course_id = 123, item = "users", include = "email")
 get_course_items <- function(course_id, item, include = NULL) {
   valid_items <- c("settings", "discussion_topics", "todo", "enrollments", "users", "students",
                    "features", "assignments", "files", "modules", "front_page", "pages", "quizzes",
@@ -126,13 +130,15 @@ get_course_items <- function(course_id, item, include = NULL) {
 #'
 #' @description This function returns permission information for the calling user in the given course.
 #'
-#' @param course_id The ID of the course for which you want to get permission information.
-#' @param permissions A vector of permission names to check against the authenticated user.
-#'                    Permission names are documented in the Create a role endpoint.
+#' @param course_id The ID of the course for which you want to get permission information. (Integer)
+#' @param permissions A vector of permission names to check against the authenticated user. Permission names are documented in the Create a role endpoint. (String)
 #'
-#' @return A named list with permission names and their respective boolean values (TRUE/FALSE).
+#' @return A named list with permission names and their respective boolean values.
 #' @import httr
 #' @export
+#'
+#' @examples
+#' get_course_permissions(course_id = 123)
 get_course_permissions <- function(course_id, permissions = NULL) {
   url <- make_canvas_url("courses", course_id, "permissions")
 
@@ -150,16 +156,17 @@ get_course_permissions <- function(course_id, permissions = NULL) {
   dat
 }
 
-#' @title Function to return course outcome results.
+#' @title Get course outcome results
 #'
-#' @description Returns a data.frame containing course outcome results.
+#' @description This function retrieves course outcome results and returns them as a data frame.
 #'
-#' @param course_id A valid Canvas course id
-#' @return data frame
+#' @param course_id The ID of the course for which you want to get permission information. (Integer)
+#'
+#' @return A data frame containing course outcome results.
 #' @export
 #'
 #' @examples
-#' #' get_outcome_results(course_id = 20)
+#' get_outcome_results(course_id = 123)
 get_outcome_results <- function(course_id) {
   url <- make_canvas_url("courses", course_id, "outcome_results")
   args <- list(per_page = 100)
@@ -170,15 +177,15 @@ get_outcome_results <- function(course_id) {
 
 #' @title Search all courses
 #'
-#' @description Returns a data.frame of all public courses (optoinally matching the search term)
+#' @description This function searches for all public courses and returns the results as a data frame.
 #'
-#' @param search optional search keyword
-#' @return data frame
+#' @param search An optional search keyword to filter the courses (String)
+#' @return A data frame containing the search results
 #' @export
 #'
 #' @examples
-#'   \dontrun{search_courses()}
-#'   \dontrun{search_courses(search="big data")}
+#' search_courses()
+#' search_courses(search = "big data")
 search_courses <- function(search = NULL) {
   url <- make_canvas_url("search", "all_courses")
   args = list(per_page = 100)

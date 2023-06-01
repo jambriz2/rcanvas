@@ -1,12 +1,11 @@
-#' @title Function to list all assignments
+#' @title Get all assignments
 #'
-#' @param course_id Course ID
+#' @param course_id The ID of the course for which you want to get permission information. (Integer)
 #'
-#' @return data frame
+#' @return A data frame with the details of all assignments in the course.
 #' @export
-#'
 #' @examples
-#' #' get_assignment_list()
+#' get_assignment_list(course_id = 123)
 get_assignment_list <- function(course_id = NULL) {
   stopifnot(!is.null(course_id))
   url <- make_canvas_url("courses", course_id, "assignments")
@@ -17,14 +16,16 @@ get_assignment_list <- function(course_id = NULL) {
 
 #' @title Get a single assignment
 #'
-#' @param course_id integer, the ID of the course
-#' @param assignment_id integer, the ID of the assignment
-#' @param include string vector, the associations to include with the assignment
-#' @param override_assignment_dates boolean, whether to apply assignment overrides to the assignment
-#' @param needs_grading_count_by_section boolean, whether to split up "needs_grading_count" by sections
-#' @param all_dates boolean, whether to include all dates associated with the assignment
-#' @return a data frame with the details of the single assignment
+#' @param course_id The ID of the course for which you want to get permission information. (Integer)
+#' @param assignment_id The ID of the assignment. (Integer)
+#' @param include The associations to include with the assignment. (String Vector)
+#' @param override_assignment_dates Whether to apply assignment overrides to the assignment. (Boolean)
+#' @param needs_grading_count_by_section Whether to split up "needs_grading_count" by sections. (Boolean)
+#' @param all_dates Whether to include all dates associated with the assignment. (Boolean)
+#'
+#' @return A data frame with the details of the single assignment.
 #' @export
+#' get_single_assignment(course_id = 123, assignment_id = 12345)
 get_single_assignment <- function(course_id,
                                   assignment_id,
                                   include = NULL,
